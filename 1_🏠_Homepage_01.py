@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import pickle
 import plotly.express as px
+import xgboost as xgb
 
 import matplotlib.pyplot as plt
 
@@ -13,7 +14,7 @@ st.set_page_config(page_title="Homepage",page_icon="👋")
 st.sidebar.success("Select a page above.")
 
 st.write('# Generator Health Index Prediction')  #st.title('')
-st.image('../picture./8716725.png', width=45)
+st.image('./picture/8716725.png', width=45)
 st.markdown(
     """
     **This is a dashboard showing the *health index prediction* of generator "GT3301 at 15.15MW"**
@@ -24,7 +25,7 @@ st.markdown(
 """
 )
 
-st.image('../picture./GT3301.png')
+st.image('./picture/GT3301.png')
 
 
 st.sidebar.header("Input features for simulation 👨🏽‍🔬")
@@ -33,8 +34,8 @@ st.sidebar.header("Input features for simulation 👨🏽‍🔬")
 # Collects user input features into dataframe
 uploaded_file = st.sidebar.file_uploader("Upload your input CSV file", type=["csv"])
 
-select = st.sidebar.radio("Select Model",('XGBoost Regression','Voting Regressor'))
-
+#select = st.sidebar.radio("Select Model",('XGBoost Regression','Voting Regressor'))
+select = st.sidebar.radio("Select Model",('XGBoost Regression','Random Forest Regressor'))
 
 if uploaded_file is not None:
     input_df2 = pd.read_csv(uploaded_file)
@@ -109,7 +110,7 @@ else:
 #-----------------------------------------------------------------
 lastrow = len(input_df.index)
 
-data_train = pd.read_csv('../20221208_DataForStreamlit_1.csv')
+data_train = pd.read_csv('./20221208_DataForStreamlit_1.csv')
 raw_data = data_train.drop(columns=['Start_time','End_time','Severity'])
 
 
@@ -124,7 +125,7 @@ df = df[:]
 
 # Displays the user input features
 st.subheader('1. Features for Simulation')
-st.image('../picture./7068006.png', width=45)
+st.image('./picture/7068006.png', width=45)
 if uploaded_file is not None:
    st.write(input_df)
 else:
@@ -138,9 +139,9 @@ df = scaler.fit_transform(df)
 #st.write(df)
 
 # Reads in saved regression model
-load_clf1 = pickle.load(open('../20221221_XGBModel.pkl', 'rb'))
-load_clf2 = pickle.load(open('../20221221_VotingModel.pkl', 'rb'))
-
+load_clf1 = pickle.load(open('./20221221_XGBModel.pkl', 'rb'))
+#load_clf2 = pickle.load(open('./20221221_VotingModel.pkl', 'rb'))
+load_clf2 = pickle.load(open('./20221201_RFModel.pkl', 'rb'))
 
 
 # Apply model to make predictions
@@ -148,13 +149,13 @@ predict = pd.DataFrame(df).iloc[:lastrow]
 #prediction = load_clf2.predict(predict)
 if select == 'XGBoost Regression':
     prediction = load_clf1.predict(predict)
-elif select =='Voting Regressor':
+elif select =='Random Forest Regressor':
     prediction = load_clf2.predict(predict)
 
 #----------------------------------------------------------
 
 st.subheader('2. Simulation and Prediction')
-st.image('../picture./2382533.png', width=45)
+st.image('./picture/2382533.png', width=45)
 #st.write([prediction])
 st.write('Severity')
 st.write(prediction)
@@ -163,7 +164,7 @@ st.write(prediction)
 
 
 st.subheader('3. Chart of severity')
-st.image('../picture./1807350.png', width=45)
+st.image('./picture/1807350.png', width=45)
 st.write("3.1 Line chart of eeverity")
 #line_fig = px.line(uploaded_file,x='Start_time', y='prediction', title='Line chart of eeverity')
 #st.plotly_chart(line_fig)
